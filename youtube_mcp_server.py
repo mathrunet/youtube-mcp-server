@@ -33,10 +33,16 @@ YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3"
 
 # Load API key from credentials file
 def load_api_key() -> str:
-    """Load YouTube API key from credentials.yml file."""
+    """Load YouTube API key from environment variable or credentials.yml file."""
+    # Check environment variable first
+    env_key = os.environ.get("YOUTUBE_API_KEY")
+    if env_key:
+        return env_key
+
+    # Fall back to credentials.yml
     script_dir = Path(__file__).parent
     credentials_file = script_dir / "credentials.yml"
-    
+
     try:
         with open(credentials_file, 'r') as f:
             content = f.read()
@@ -51,7 +57,7 @@ def load_api_key() -> str:
                         return key_part.strip('\"\'')
         raise ValueError("youtube_api_key not found in credentials.yml")
     except FileNotFoundError:
-        raise ValueError("credentials.yml file not found. Please create it with your YouTube API key.")
+        raise ValueError("YOUTUBE_API_KEY environment variable not set and credentials.yml file not found.")
     except Exception as e:
         raise ValueError(f"Error reading credentials.yml: {str(e)}")
 
